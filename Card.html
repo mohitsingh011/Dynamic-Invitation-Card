@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Card Page</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        header,
+        footer {
+            width: 100%;
+            text-align: center;
+        }
+
+        header img,
+        footer img {
+            width: 100%;
+            height: 100;
+            background-size: cover;
+        }
+
+        footer img {
+            margin-top: 72px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <div class="container">
+            <header>
+                <img src="header.png" alt="" id="header-image">
+            </header>
+            <form id="pdfform">
+
+                <div class="form">
+                    <div class="grp1">
+                        <label for="name" id="namelabel" style="white-space: nowrap;">Dear Dr</label>
+                        <input required type="text" name="Name" autocomplete="name" placeholder="Name" id="name"
+                            minlength="3" maxlength="80">
+                    </div>
+                    <label for="name" id="dgm">We are pleased to invite for DGM on <br>Febutaz on below topic</label>
+                    <input required type="text" name="Name" autocomplete="name" placeholder="Topic" id="topic"
+                        minlength="3" maxlength="80">
+                    <label for="name" id="heldon"> To be Held on </label>
+                    <div class="grp2">
+                        <label for="name" id="namelabel">Day:</label>
+                        <input required type="text" name="Name" autocomplete="name" placeholder="Enter Day" id="day"
+                            minlength="3" maxlength="80">
+                        <label for="name" id="namelabel">Date:</label>
+                        <input required type="date" name="Name" autocomplete="name" placeholder="Enter Date" id="date"
+                            minlength="3" maxlength="80">
+                    </div>
+                    <div class="grp1 timegrp">
+                        <label for="name" id="namelabel">Time: </label>
+                        <input required type="time" name="Name" autocomplete="name" placeholder="Enter Time" id="time"
+                            minlength="3" maxlength="80">
+                    </div>
+                    <label for="name" id="venue"> The Venue Details are given below </label>
+                    <div class="grp1 hotelgrp">
+                        <label for="name" id="namelabel">Hotel: </label>
+                        <input required type="text" name="Name" autocomplete="name" placeholder="Enter Hotel Name"
+                            id="hotel" minlength="3" maxlength="80">
+                    </div>
+                    <div class="grp1 addgrp">
+                        <label for="address" id="namelabel">Address: </label>
+                        <textarea required name="Address" autocomplete="address" placeholder="Enter Address"
+                            id="address" rows="2" minlength="3" maxlength="160"></textarea>
+                    </div>
+                    <label for="name" id="venue"> Request your esteemed presence </label>
+                    <button type="submit" id="submitBtn">Generate Pdf</button>
+                </div>
+            </form>
+            <footer>
+                <img src="footer.png" alt="" id="footer-image">
+            </footer>
+        </div>
+
+        <!-- <iframe src="" id="myPdf" style="height: 1000px; width: 500px;"></iframe> -->
+
+
+        <script>
+        </script>
+        <script>
+
+            try {
+                const submitBtn = document.getElementById("submitBtn");
+                submitBtn.addEventListener("click", async function (e) {
+                    e.preventDefault();
+                    const name = document.getElementById("name").value;
+                    const topic = document.getElementById("topic").value;
+                    const day = document.getElementById("day").value;
+                    const date = document.getElementById("date").value;
+                    const time = document.getElementById("time").value;
+                    const hotel = document.getElementById("hotel").value;
+                    const address = document.getElementById("address").value;
+
+                    if (!name || !topic || !day || !date || !time || !hotel || !address) {
+                        alert("Please fill in all the fields.");
+                        return;
+                    }
+
+                    console.log({ name, topic, day, date, time, hotel, address });
+                    const { PDFDocument, rgb } = PDFLib;
+                    const exBytes = await fetch("./CardPdfTemplate.pdf").then(res => {
+                        console.log("data: ", res);
+                        return res.arrayBuffer();
+                    });
+                    console.log({ name, topic, day, date, time, hotel, address });
+                    const pdfDoc = await PDFDocument.load(exBytes);
+                    const pages = pdfDoc.getPages();
+                    const firstPg = pages[0];
+                    firstPg.drawText(name, {
+                        x: 230,
+                        y: 640,
+                        size: 16
+                    });
+                    firstPg.drawText(topic, {
+                        x: 230,
+                        y: 547,
+                        size: 16
+                    });
+                    firstPg.drawText(day, {
+                        x: 170,
+                        y: 465,
+                        size: 15
+                    });
+                    firstPg.drawText(date, {
+                        x: 370,
+                        y: 465,
+                        size: 15
+                    });
+                    firstPg.drawText(time, {
+                        x: 220,
+                        y: 424,
+                        size: 15
+                    });
+                    firstPg.drawText(hotel, {
+                        x: 210,
+                        y: 351,
+                        size: 15
+                    });
+                    firstPg.drawText(address, {
+                        x: 220,
+                        y: 300,
+                        size: 15
+                    });
+                    const pdfBytes = await pdfDoc.save();
+
+                    // Convert the PDF bytes to a blob
+                    const pdfBlob = new Blob([pdfBytes], { type: "application/pdf" });
+
+                    // Use FileSaver.js to save the PDF as a file
+                    saveAs(pdfBlob, "GeneratedPDF.pdf");
+
+                })
+            } catch (error) {
+                console.log("error: ", error);
+            }
+
+        </script>
+        <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+        <script src="FileSaver.js"></script>
+    </div>
+</body>
+
+</html>
